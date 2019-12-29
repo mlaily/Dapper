@@ -3557,7 +3557,9 @@ namespace Dapper
             {
                 bool handled = false;
                 OpCode opCode = default;
-                switch (Type.GetTypeCode(from))
+                if (SqlMapper.AssumeColumnsAreStronglyTyped)
+                {
+                    switch (Type.GetTypeCode(from))
                 {
                     case TypeCode.Boolean:
                     case TypeCode.Byte:
@@ -3599,6 +3601,7 @@ namespace Dapper
                                 break;
                         }
                         break;
+                }
                 }
                 if (handled)
                 {
@@ -3732,6 +3735,12 @@ namespace Dapper
         }
 
         private static IEqualityComparer<string> connectionStringComparer = StringComparer.Ordinal;
+
+        /// <summary>
+        /// Some data providers change column types dynamically.
+        /// If set to false, all value conversions will be done via Convert.ChangeType to handle this behavior.
+        /// </summary>
+        public static bool AssumeColumnsAreStronglyTyped { get; set; } = true;
 
         /// <summary>
         /// Key used to indicate the type name associated with a DataTable.
